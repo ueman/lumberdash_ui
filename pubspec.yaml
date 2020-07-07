@@ -1,6 +1,6 @@
 name: lumberdashui
 description: A lumberdash client wich shows the logs in a widget inside your app.
-version: 0.1.1
+version: 0.2.0
 homepage: https://uekoetter.dev
 repository: https://github.com/ueman/lumberdash_ui
 issue_tracker: https://github.com/ueman/lumberdash_ui/issues
