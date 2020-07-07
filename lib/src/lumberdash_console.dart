@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:lumberdashui/src/ansi_parser.dart';
 import 'package:lumberdashui/src/level.dart';
 import 'package:lumberdashui/src/log_entry.dart';
 import 'package:lumberdashui/src/lumberdash_ui_client.dart';
@@ -16,8 +15,7 @@ class LogConsole extends StatefulWidget {
 class RenderedEvent {
   final int id;
   final Level level;
-  final TextSpan span;
-  final String lowerCaseText;
+  final String text;
 
   Color get color {
     switch (level) {
@@ -55,7 +53,7 @@ class RenderedEvent {
     throw Exception();
   }
 
-  RenderedEvent(this.id, this.level, this.span, this.lowerCaseText);
+  RenderedEvent(this.id, this.level, this.text);
 }
 
 class _LogConsoleState extends State<LogConsole> {
@@ -104,7 +102,7 @@ class _LogConsoleState extends State<LogConsole> {
         return false;
       } else if (_filterController.text.isNotEmpty) {
         var filterText = _filterController.text.toLowerCase();
-        return it.lowerCaseText.contains(filterText);
+        return it.text.contains(filterText);
       } else {
         return true;
       }
@@ -168,10 +166,11 @@ class _LogConsoleState extends State<LogConsole> {
   }
 
   Widget _buildLogContent() {
-    return ListView.builder(
+    return ListView.separated(
       shrinkWrap: true,
       controller: _scrollController,
       itemCount: _filteredBuffer.length,
+      separatorBuilder: (context, index) => const Divider(),
       itemBuilder: (context, index) {
         var logEntry = _filteredBuffer[index];
         return SingleChildScrollView(
@@ -186,8 +185,8 @@ class _LogConsoleState extends State<LogConsole> {
                   style: TextStyle(fontSize: 25),
                 ),
               ),
-              Text.rich(
-                logEntry.span,
+              Text(
+                logEntry.text,
                 key: Key(logEntry.id.toString()),
                 style: TextStyle(fontSize: _logFontSize, color: logEntry.color),
               ),
@@ -201,17 +200,17 @@ class _LogConsoleState extends State<LogConsole> {
   Widget _buildBottomBar() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).canvasColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Theme.of(context).splashColor,
             spreadRadius: 5,
             blurRadius: 7,
-            offset: Offset(0, 3), // changes position of shadow
+            offset: Offset(0, 3),
           ),
         ],
       ),
-      padding: EdgeInsets.only(left: 16, top: 16, right: 16),
+      padding: EdgeInsets.all(16),
       child: SafeArea(
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -277,15 +276,10 @@ class _LogConsoleState extends State<LogConsole> {
   }
 
   RenderedEvent _renderEvent(LogEntry event) {
-    final dark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-    var parser = AnsiParser(dark);
-    var text = event.lines.join('\n');
-    parser.parse(text);
     return RenderedEvent(
       _currentId++,
       event.level,
-      TextSpan(children: parser.spans),
-      text.toLowerCase(),
+      event.lines,
     );
   }
 }

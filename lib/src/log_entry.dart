@@ -15,12 +15,12 @@ class LogEntry {
   final dynamic stacktrace;
   final DateTime time;
 
-  List<String> get lines {
+  String get lines {
     return [
-      if (time != null) time.toIso8601String(),
+      if (time != null) time.toString(),
       if (message != null) message,
       if (exception != null) exception.toString(),
       if (stacktrace != null) stacktrace.toString(),
-    ];
+    ].join('\n');
   }
 }
