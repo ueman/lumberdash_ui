@@ -185,7 +185,7 @@ class _LogConsoleState extends State<LogConsole> {
                   style: TextStyle(fontSize: 25),
                 ),
               ),
-              Text(
+              SelectableText(
                 logEntry.text,
                 key: Key(logEntry.id.toString()),
                 style: TextStyle(fontSize: _logFontSize, color: logEntry.color),
